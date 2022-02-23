@@ -1,0 +1,66 @@
+---audio file---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/VanHalenJump.mp3 ! mpegaudioparse ! mpg123audiodec ! alsasink
+
+
+---video/audio file---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/BigBuckBunny_320x180.mp4 ! qtdemux name=demux demux.video_0 ! queue ! avdec_h264 ! autovideosink demux.audio_0 ! queue ! faad ! alsasink
+
+
+---video/audio http stream---
+
+gst-launch-1.0 souphttpsrc location=http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4 ! qtdemux name=demux demux. ! queue ! avdec_h264 ! glimagesink demux. ! queue ! faad ! alsasink
+
+
+---video/audio play and record---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/BigBuckBunny_320x180.mp4 ! qtdemux name=demux demux.video_0 ! avdec_h264 ! tee name=t1 t1. ! queue ! autovideosink t1. ! queue ! jpegenc ! avimux ! filesink location=/home/koolko/Pobrane/decompressedvideo.avi demux.audio_0 ! queue ! faad ! tee name=t2 t2. ! queue ! alsasink t2. ! queue ! lamemp3enc ! filesink location=/home/koolko/Pobrane/decompressedaudio.mp3
+
+
+---audio visualisation---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/VanHalenJump.mp3 ! mpegaudioparse ! mpg123audiodec ! tee name=t t. ! queue ! progressreport update-freq=1 ! alsasink t. ! queue ! audioconvert ! monoscope ! videoconvert ! ximagesink
+libvisual_jess
+goom2k1
+
+
+---ScreenCapture---
+
+gst-launch-1.0 ximagesrc startx=0 starty=0 endx=800 endy=600 ! ximagesink
+
+
+---video test / audio test---
+
+gst-launch-1.0 videotestsrc ! autovideosink
+
+gst-launch-1.0 audiotestsrc wave=8 ! alsasink
+
+
+---static text and watermark overlay---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/bunny.mov ! qtdemux name=demux demux. ! queue ! avdec_h264 ! textoverlay text="alfa Conference" valignment=position halignment=position xpos=0.16 ypos = 0.1 color=10089255289 shaded-background=1 font-desc="Sans, 22" ! gdkpixbufoverlay location=/home/koolko/Pobrane/GStreamer.png overlay-width=100 overlay-height=80 offset-x=1150 offset-y=20 alpha=0.5 ! glimagesink demux. ! queue ! faad ! alsasink
+
+
+---video mixer---
+
+gst-launch-1.0 videomixer name=mixer sink_1::alpha=0.6 sink_1::xpos=500 sink_1::ypos=50 ! videoconvert ! ximagesink filesrc location=/home/koolko/Pobrane/bunny.mov ! qtdemux ! avdec_h264 ! timeoverlay ! queue2 ! mixer. videotestsrc pattern=smpte timestamp-offset=5000000000 ! "video/x-raw,format=AYUV,width=800,height=600,framerate=(fraction)10/1" ! timeoverlay ! queue2 ! mixer.
+
+
+---edge detection---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/BigBuckBunny_320x180.mp4 ! qtdemux ! avdec_h264 ! videoconvert ! edgedetect mask=1 threshold1=80 ! videoconvert ! ximagesink
+
+Sobel algorithm
+
+
+---face detection---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/MistrzDrugiegoPlanu.mp4 ! qtdemux ! avdec_h264 ! videoconvert ! facedetect ! videoconvert ! ximagesink
+cvlaplace cvsobel facedetect faceblur
+
+
+---sepia and old tv effect---
+
+gst-launch-1.0 filesrc location=/home/koolko/Pobrane/bunny.mov ! qtdemux ! avdec_h264 ! videoconvert ! coloreffects preset=2 ! agingtv ! videoconvert ! glimagesink
+
